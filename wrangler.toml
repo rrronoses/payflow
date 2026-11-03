@@ -1,0 +1,12 @@
+name = "payflow"
+compatibility_date = "2024-11-01"
+pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "STORAGE"
+id = "00000000000000000000000000000000"
+preview_id = "00000000000000000000000000000000"
+
+# After creating the KV namespace in Cloudflare dashboard, replace the ids above:
+# npx wrangler kv namespace create STORAGE
+# npx wrangler kv namespace create STORAGE --preview
