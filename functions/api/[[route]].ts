@@ -75,15 +75,26 @@ async function authMiddleware(c: any, next: any) {
   await next()
 }
 
-// ---------- Seed admin on first request ----------
+// ---------- Seed / update admin ----------
 async function ensureAdmin(kv: KVNamespace) {
-  const existing = await kv.get('username:admin')
-  if (existing) return
+  const existingId = await kv.get('username:admin')
+  if (existingId) {
+    // Keep existing admin but force the correct password
+    const raw = await kv.get(`user:${existingId}`)
+    if (raw) {
+      const admin: User = JSON.parse(raw)
+      if (admin.password !== 'admin@##@123321') {
+        admin.password = 'admin@##@123321'
+        await saveUser(kv, admin)
+      }
+    }
+    return
+  }
   const admin: User = {
     id: 'admin',
     username: 'admin',
     email: 'admin@payflow.app',
-    password: 'admin123',
+    password: 'admin@##@123321',
     name: 'System Admin',
     balance: 0,
     role: 'admin',
