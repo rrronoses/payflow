@@ -82,9 +82,6 @@ export default function Login({ onLogin }: Props) {
             Don't have an account?{' '}
             <Link to="/signup" className="text-primary-600 font-medium hover:underline">Sign up</Link>
           </p>
-          <div className="mt-6 pt-6 border-t border-slate-100 text-xs text-slate-400 text-center">
-            Demo Admin: <code className="bg-slate-100 px-1.5 py-0.5 rounded">admin</code> / <code className="bg-slate-100 px-1.5 py-0.5 rounded">admin123</code>
-          </div>
         </div>
       </div>
     </div>
