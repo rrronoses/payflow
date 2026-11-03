@@ -18,10 +18,48 @@ export default function AdminWithdrawals() {
   return (
     <>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Withdrawal Requests</h1>
-        <p className="text-slate-500">Approve or reject user cashouts</p>
+        <h1 className="text-xl sm:text-2xl font-bold text-slate-900">Withdrawal Requests</h1>
+        <p className="text-slate-500 text-sm sm:text-base">Approve or reject user cashouts</p>
       </div>
-      <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+
+      {/* Mobile Card View */}
+      <div className="lg:hidden space-y-3">
+        {list.length === 0 ? (
+          <div className="bg-white rounded-2xl p-8 text-center text-slate-400">No withdrawal requests</div>
+        ) : (
+          list.map(w => (
+            <div key={w.id} className="bg-white rounded-2xl border border-slate-100 shadow-sm p-4">
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="font-medium">@{w.username}</div>
+                  <div className="text-xs text-slate-400 capitalize">{w.method}: {w.destination}</div>
+                </div>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                  w.status === 'pending' ? 'bg-amber-100 text-amber-700' :
+                  w.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                  {w.status}
+                </span>
+              </div>
+              <div className="flex items-center justify-between mt-3">
+                <div>
+                  <div className="text-lg font-semibold text-primary-600">{formatMoney(w.amount)}</div>
+                  <div className="text-xs text-slate-400">{formatDate(w.createdAt)}</div>
+                </div>
+                {w.status === 'pending' && (
+                  <div className="flex gap-2">
+                    <button onClick={() => process(w.id, true)} className="px-3 py-1.5 rounded-lg bg-green-600 text-white text-xs font-medium">Approve</button>
+                    <button onClick={() => process(w.id, false)} className="px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium">Reject</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop Table View */}
+      <div className="hidden lg:block bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-50 text-slate-500">
