@@ -1,61 +1,86 @@
-# PayFlow – Send & Receive Money Platform
+# PayFlow – Send & Receive Money (TypeScript + Cloudflare KV)
 
-A modern, beautiful peer-to-peer money transfer web application with full **User Panel** and **Admin Panel**.
+Modern full-stack money transfer platform built with:
+
+- **Frontend**: React + TypeScript (TSX) + Tailwind CSS + Vite
+- **Backend**: Hono on Cloudflare Pages Functions
+- **Storage**: Cloudflare **KV** (all users, sessions, transactions, withdrawals)
 
 ## Features
 
-### User
-- Sign up with username, email & password
+### User Panel
+- Sign up (username + email + password)
 - Login with **username or email** + password
-- Dashboard with balance and recent activity
-- **Send Money** – type username → live suggestions → transfer
-- **Receive Money** – copy username + QR code barcode
-- **Withdraw** – PayPal email or M-Pesa number (pending admin approval)
+- Dashboard with live balance & recent activity
+- **Send Money** with live username suggestions
+- **Receive Money** – copy username + QR code
+- **Withdraw** to PayPal email or M-Pesa number (pending admin approval)
 - Profile – set display name
-- Settings – change email (requires current password) / change password (requires current password)
+- Settings – change email / password (requires current password)
 - Logout
 
-### Admin
-- Secure admin login
-- Dashboard with key stats (users, total balance, pending withdrawals, transactions)
-- Full User List:
-  - View detailed profile
-  - Add / Subtract balance
-  - Ban / Unban
-  - Remove user
-- Withdrawal management – Approve or Reject (rejection auto-refunds the user)
-
-## Tech
-- Pure HTML + Tailwind CSS (CDN) + Vanilla JS
-- localStorage for data (perfect for Cloudflare Pages static hosting)
-- QR code generation for receive
-
-> **Note**: This is a fully functional demo. Data lives in the browser’s localStorage. For real multi-user production use, connect a backend (Cloudflare D1 + Workers recommended).
+### Admin Panel
+- Dashboard with real-time stats
+- User list: view, add/subtract balance, ban/unban, remove
+- Withdrawal management: Approve / Reject (reject auto-refunds)
 
 ## Demo Credentials
 - **Admin**: `admin` / `admin123`
-- Create your own user accounts via Sign Up
+- Create regular users via Sign Up
 
-## Deploy to Cloudflare Pages
+## Setup & Deploy
 
-1. Push this repository to GitHub
-2. Go to [Cloudflare Dashboard → Pages](https://dash.cloudflare.com/?to=/:account/pages)
-3. Create a new project → Connect to Git → select this repo
-4. Build settings:
-   - Framework preset: **None**
-   - Build command: *(leave empty)*
-   - Build output directory: `/` (or leave default)
-5. Deploy!
-
-Every push to `main` will automatically redeploy.
-
-## Local Preview
-Just open `index.html` in any modern browser, or serve with any static server:
-
+### 1. Create KV Namespace
 ```bash
-npx serve .
+npx wrangler login
+npx wrangler kv namespace create STORAGE
+npx wrangler kv namespace create STORAGE --preview
 ```
+Copy the IDs into `wrangler.toml`.
+
+### 2. Install & Build
+```bash
+npm install
+npm run build
+```
+
+### 3. Deploy to Cloudflare Pages
+```bash
+npx wrangler pages deploy dist
+```
+
+Or connect the GitHub repo in Cloudflare Dashboard → Pages → Create project.
+
+**Important**: In the Pages project settings, bind the KV namespace:
+- Variable name: `STORAGE`
+- KV namespace: the one you created
+
+### Local Development
+```bash
+# Terminal 1 – frontend
+npm run dev
+
+# Terminal 2 – functions (with KV)
+npx wrangler pages dev dist --kv=STORAGE
+```
+
+## Project Structure
+```
+├── functions/api/[[route]].ts   # Hono API + KV logic
+├── src/
+│   ├── pages/                   # React TSX pages
+│   ├── lib/api.ts               # API client
+│   └── types.ts
+├── wrangler.toml                # KV binding
+└── package.json
+```
+
+All data is persisted in Cloudflare KV under keys like:
+- `user:{id}`, `username:{name}`, `email:{email}`
+- `session:{token}`
+- `tx:{id}`, `wd:{id}`
+- Index lists: `tx:recent`, `wd:list`
 
 ---
 
-Built with ❤️ for instant money transfers.
+Built for Cloudflare Pages + KV.
