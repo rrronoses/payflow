@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
 import { api, getToken, setToken } from './lib/api'
 import type { User } from './types'
+import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import UserLayout from './pages/UserLayout'
@@ -34,7 +35,7 @@ export default function App() {
     await api.logout().catch(() => {})
     setToken(null)
     setUser(null)
-    navigate('/login')
+    navigate('/')
   }
 
   if (loading) {
@@ -50,13 +51,25 @@ export default function App() {
 
   return (
     <Routes>
+      {/* Public Landing Page */}
+      <Route path="/" element={user ? <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} /> : <Landing />} />
+
       <Route path="/login" element={user ? <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} /> : <Login onLogin={handleLogin} />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" /> : <Signup onLogin={handleLogin} />} />
-      
-      <Route path="/dashboard/*" element={user && user.role === 'user' ? <UserLayout user={user} setUser={setUser} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-      <Route path="/admin/*" element={user && user.role === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />} />
-      
-      <Route path="*" element={<Navigate to={user ? (user.role === 'admin' ? '/admin' : '/dashboard') : '/login'} />} />
+
+      {/* User Panel */}
+      <Route
+        path="/dashboard/*"
+        element={user && user.role === 'user' ? <UserLayout user={user} setUser={setUser} onLogout={handleLogout} /> : <Navigate to="/login" />}
+      />
+
+      {/* Admin Panel */}
+      <Route
+        path="/admin/*"
+        element={user && user.role === 'admin' ? <AdminLayout user={user} onLogout={handleLogout} /> : <Navigate to="/login" />}
+      />
+
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   )
 }
