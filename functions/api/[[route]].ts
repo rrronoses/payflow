@@ -79,7 +79,6 @@ async function authMiddleware(c: any, next: any) {
 async function ensureAdmin(kv: KVNamespace) {
   const existingId = await kv.get('username:admin')
   if (existingId) {
-    // Keep existing admin but force the correct password
     const raw = await kv.get(`user:${existingId}`)
     if (raw) {
       const admin: User = JSON.parse(raw)
@@ -259,6 +258,9 @@ app.post('/withdraw', authMiddleware, async (c) => {
 
   if (!['paypal', 'mpesa'].includes(method) || !destination || isNaN(amount) || amount <= 0) {
     return c.json({ ok: false, msg: 'Invalid input' }, 400)
+  }
+  if (amount < 5) {
+    return c.json({ ok: false, msg: 'Minimum withdrawal is $5' }, 400)
   }
 
   const user = await getUserById(c.env.STORAGE, c.get('userId'))
