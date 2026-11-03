@@ -85,13 +85,15 @@ export default function Withdraw({ user, setUser }: Props) {
               <input
                 type="number"
                 step="0.01"
-                min="1"
+                min="5"
                 value={amount}
                 onChange={e => setAmount(e.target.value)}
                 required
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary-500 outline-none"
               />
-              <p className="text-xs text-slate-400 mt-1">Available: {formatMoney(user.balance)}</p>
+              <p className="text-xs text-slate-400 mt-1">
+                Available: {formatMoney(user.balance)} · Minimum: $5.00
+              </p>
             </div>
             <button type="submit" disabled={loading} className="w-full py-3 rounded-xl bg-primary-600 hover:bg-primary-700 text-white font-semibold disabled:opacity-60">
               {loading ? <i className="fas fa-circle-notch fa-spin"></i> : 'Request Withdrawal'}
